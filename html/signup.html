@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>회원가입</title>
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #fff0f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .signup-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 360px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"] {
+      padding: 10px 40px 10px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .eye-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #888;
+    }
+
+    .nickname-check {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nickname-check input {
+      flex: 1;
+    }
+
+    .nickname-check button {
+      padding: 10px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .terms {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .terms label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: normal;
+    }
+
+    button[type="submit"],
+    button[type="button"]:not(.nickname-check button) {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #ff1493;
+    }
+
+    small {
+      font-size: 12px;
+      color: red;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <h2>회원가입</h2>
+    <form id="signupForm">
+      <label for="email">이메일</label>
+      <input type="email" id="email" placeholder="이메일을 입력해주세요" required />
+
+      <label for="password">비밀번호</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="영문+숫자+특수문자 포함 8자 이상" required />
+        <span class="eye-icon" id="togglePassword">👁️</span>
+      </div>
+      <small id="passwordMessage"></small>
+
+      <label for="confirmPassword">비밀번호 확인</label>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" placeholder="비밀번호를 다시 입력해주세요" required />
+        <span class="eye-icon" id="toggleConfirm">👁️</span>
+      </div>
+      <small id="confirmMessage"></small>
+
+      <label for="name">이름</label>
+      <input type="text" id="name" placeholder="이름을 입력해주세요" required />
+
+      <label for="nickname">닉네임</label>
+      <div class="nickname-check">
+        <input type="text" id="nickname" placeholder="닉네임을 입력해주세요" required />
+        <button type="button" id="checkNickname">중복확인</button>
+      </div>
+
+      <label for="phone">핸드폰 번호</label>
+      <input type="tel" id="phone" placeholder="010-0000-0000" required />
+
+      <label for="address">주소</label>
+      <input type="text" id="address" placeholder="주소를 입력해주세요" readonly />
+      <button type="button" onclick="searchAddress()">주소검색</button>
+
+      <fieldset class="terms">
+        <legend>약관동의</legend>
+        <label><input type="checkbox" id="agreeAll" /> 전체 동의</label>
+        <label><input type="checkbox" class="term required" /> 개인정보 처리방침 (필수)</label>
+        <label><input type="checkbox" class="term required" /> 서비스 이용약관 (필수)</label>
+        <label><input type="checkbox" class="term optional" /> 마케팅 정보 수신 동의 (선택)</label>
+      </fieldset>
+
+      <button type="submit">회원가입</button>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword(id, iconId) {
+      const input = document.getElementById(id);
+      const icon = document.getElementById(iconId);
+      icon.addEventListener("click", () => {
+        const type = input.type === "password" ? "text" : "password";
+        input.type = type;
+        icon.textContent = type === "password" ? "👁️" : "🙈";
+      });
+    }
+    togglePassword("password", "togglePassword");
+    togglePassword("confirmPassword", "toggleConfirm");
+
+    document.getElementById("password").addEventListener("input", function () {
+      const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      const msg = document.getElementById("passwordMessage");
+      msg.textContent = regex.test(this.value) ? "" : "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.";
+    });
+
+    document.getElementById("confirmPassword").addEventListener("input", function () {
+      const pw = document.getElementById("password").value;
+      const msg = document.getElementById("confirmMessage");
+      msg.textContent = this.value === pw ? "" : "비밀번호가 일치하지 않습니다.";
+    });
+
+    document.getElementById("checkNickname").addEventListener("click", function () {
+      const nickname = document.getElementById("nickname").value;
+      alert(nickname === "admin" ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
+    });
+
+    document.getElementById("phone").addEventListener("input", function () {
+      let val = this.value.replace(/\D/g, "");
+      if (val.length < 4) this.value = val;
+      else if (val.length < 7) this.value = val.slice(0,3) + "-" + val.slice(3);
+      else if (val.length < 11) this.value = val.slice(0,3) + "-" + val.slice(3,6) + "-" + val.slice(6);
+      else this.value = val.slice(0,3) + "-" + val.slice(3,7) + "-" + val.slice(7,11);
+    });
+
+    function searchAddress() {
+      new daum.Postcode({
+        oncomplete: function (data) {
+          document.getElementById("address").value = data.address;
+        }
+      }).open();
+    }
+
+    document.getElementById("agreeAll").addEventListener("change", function () {
+      const checked = this.checked;
+      document.querySelectorAll(".term").forEach(cb => cb.checked = checked);
+    });
+
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const requiredTerms = document.querySelectorAll(".term.required");
+      const allAgreed = Array.from(requiredTerms).every(cb => cb.checked);
+      if (!allAgreed) {
+        alert("필수 약관에 모두 동의해주세요.");
+        return;
+      }
+      alert("회원가입이 완료되었습니다!");
+    });
+  </script>
+</body>
+</html>
